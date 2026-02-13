@@ -257,13 +257,13 @@ export function ResultView({ data, onReset }: ResultViewProps) {
 
             {/* Valuation Section */}
              <div className="relative flex items-center justify-center w-full mt-2 pb-4 px-6">
-               {/* Centered Text Container - Restricted width to ensure badge space and prevent overflow */}
+               {/* Centered Text Container - Conditional width based on badge presence */}
                <div className={`relative flex flex-col items-center justify-center text-center ${
-                 (score === 'S' || score === 'A' || score === 'X') ? 'max-w-[180px]' : 'max-w-[300px]'
+                 (score === 'S' || score === 'A' || score === 'X') ? 'max-w-[160px]' : 'max-w-[280px]'
                }`}>
                  {/* Large Badge - Absolutely positioned to the LEFT of the text container */}
                  {(score === 'S' || score === 'A' || score === 'X') && (
-                   <div className="absolute right-[calc(100%+0.75rem)] top-1/2 -translate-y-1/2">
+                   <div className="absolute right-[calc(100%+1rem)] top-1/2 -translate-y-1/2">
                      <img 
                        src={score === 'X' ? "/assets/badge_clown.png" : "/assets/badge_valuation.png"} 
                        alt="Badge"
@@ -275,7 +275,7 @@ export function ResultView({ data, onReset }: ResultViewProps) {
                  <p className="text-sm font-black text-amber-900/50 tracking-[0.2em] uppercase mb-0.5">
                    第一桶金估值
                  </p>
-                 <div className={`${getValuationFontSize(data.saas_hook.valuation)} font-black ${theme.textPrimary} tracking-tighter leading-tight drop-shadow-sm break-words overflow-hidden`}>
+                 <div className={`${getValuationFontSize(data.saas_hook.valuation)} font-black ${theme.textPrimary} tracking-tighter leading-tight drop-shadow-sm break-words`}>
                    {data.saas_hook.valuation}
                  </div>
                </div>
@@ -365,7 +365,7 @@ export function ResultView({ data, onReset }: ResultViewProps) {
         </div>
 
         {/* Footer Section (Risks) */}
-        <div className={`p-6 space-y-3 ${score === 'X' ? 'bg-red-50' : 'bg-red-50/80'} border-t border-red-100/50`}>
+        <div className={`mt-auto p-6 space-y-3 ${score === 'X' ? 'bg-red-50' : 'bg-red-50/80'} border-t border-red-100/50`}>
           <div className="flex items-center gap-2">
             <img src="/assets/icon_risk_lock.png" alt="Risk" className="w-5 h-5 object-contain" />
             <h3 className={`text-xs font-bold uppercase tracking-widest ${score === 'X' ? 'text-red-600' : 'text-red-500/80'}`}>
@@ -387,23 +387,6 @@ export function ResultView({ data, onReset }: ResultViewProps) {
             ))}
           </div>
         </div>
-
-        {/* Poster QR Footer */}
-        <footer className="mt-auto py-6 px-6 border-t border-amber-100/30 bg-amber-50/20 flex justify-end items-center">
-          <div className="flex items-center space-x-4">
-            <div className="text-right space-y-0.5">
-              <p className="text-sm font-bold text-zinc-700">获取更多盘古创新AI内参</p>
-              <p className="text-[11px] font-medium text-zinc-500">扫码关注【盘古创新方法论】</p>
-            </div>
-            <div className="relative">
-              <img 
-                src="/assets/qr_code.jpg" 
-                alt="盘古创新方法论" 
-                className="w-24 h-24 rounded-xl shadow-md border-2 border-white/80"
-              />
-            </div>
-          </div>
-        </footer>
       </div>
 
       {/* Reset Button */}
