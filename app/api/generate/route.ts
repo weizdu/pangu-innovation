@@ -42,8 +42,11 @@ const SYSTEM_PROMPT = `你是一个精通《创新者的第一桶金》方法论
    - **评级**: X
 
 ### 输出要求：
-必须只输出一个合法的 JSON 对象，不要包含任何 Markdown 标记或解释性文字。确保 JSON 格式严谨，没有多余的逗号，所有括号匹配。
-  注意：在生成 \`valuation\` (估值) 时，严禁输出区间范围（如“500万-1000万”），必须根据项目实际潜力给出一个具体的、确定的数值（如“¥860万”、“¥1.2亿”）。数值可以包含人民币符号。
+1. 必须只输出一个合法的 JSON 对象。
+2. **严禁包含任何 Markdown 标记（如 \`\`\`json）或解释性文字**。
+3. **JSON 格式必须严谨**：确保没有多余的逗号（尤其是数组最后一个元素后），所有括号必须匹配。
+4. **特殊字符转义**：如果内容中包含双引号，必须使用反斜杠进行转义（如 \`\\\"内容\\\"\`），以防破坏 JSON 结构。
+5. 在生成 \`valuation\` (估值) 时，严禁输出区间范围（如“500万-1000万”），必须根据项目实际潜力给出一个具体的、确定的数值（如“¥860万”、“¥1.2亿”）。数值可以包含人民币符号。
 
 {
   "header": {
@@ -102,7 +105,7 @@ export async function POST(request: Request) {
           { role: "system", content: SYSTEM_PROMPT },
           { role: "user", content: idea }
         ],
-        temperature: 1.0,
+        temperature: 0.8,
         stream: false
       })
     });
@@ -136,8 +139,11 @@ export async function POST(request: Request) {
       }
     }
 
-    // 再次清理多余空白
+    // 再次清理多余空白和可能的尾随逗号
     content = content.trim();
+    
+    // 简单的尾随逗号清理 (处理数组或对象最后一个元素后的逗号)
+    content = content.replace(/,\s*([\]}])/g, '$1');
 
     try {
       const jsonResult = JSON.parse(content);
@@ -145,10 +151,17 @@ export async function POST(request: Request) {
       return NextResponse.json(jsonResult);
     } catch (parseError) {
       console.error('JSON Parse Error content:', content);
-      return NextResponse.json({ 
-        error: '生成结果格式错误，请稍后再试',
-        details: parseError instanceof Error ? parseError.message : String(parseError)
-      }, { status: 500 });
+      // 如果解析失败，尝试最后一次清理：处理字符串内部未转义的换行符
+      try {
+        const cleanedContent = content.replace(/\n/g, '\\n').replace(/\r/g, '\\r');
+        const jsonResult = JSON.parse(cleanedContent);
+        return NextResponse.json(jsonResult);
+      } catch (e) {
+        return NextResponse.json({ 
+          error: '生成结果格式错误，请稍后再试',
+          details: parseError instanceof Error ? parseError.message : String(parseError)
+        }, { status: 500 });
+      }
     }
 
   } catch (error) {

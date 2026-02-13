@@ -293,7 +293,7 @@ export default function Home() {
             <div className="flex flex-col items-center gap-4">
               <div className="relative aspect-square w-full overflow-hidden rounded-xl bg-muted">
                 <img 
-                  src="/assets/qrcode.jpg" 
+                  src="/assets/qr_code.jpg" 
                   alt="QR Code" 
                   className="h-full w-full object-cover"
                 />

@@ -128,8 +128,8 @@ export function ResultView({ data, onReset }: ResultViewProps) {
     try {
       setIsGenerating(true);
       
-      // 给一点点延迟确保渲染完成
-      await new Promise(resolve => setTimeout(resolve, 100));
+      // 给一点点延迟确保渲染完成（图片加载等）
+      await new Promise(resolve => setTimeout(resolve, 300));
       
       const canvas = await html2canvas(element, {
         scale: 2, // 提高清晰度
@@ -226,7 +226,7 @@ export function ResultView({ data, onReset }: ResultViewProps) {
       <div 
         ref={captureRef} 
         id="poster-card" 
-        className="w-full max-w-[375px] mx-auto bg-[#fdfaf1] rounded-2xl shadow-2xl relative overflow-hidden flex flex-col border border-amber-100/50"
+        className="w-full max-w-[375px] mx-auto bg-[#fdfaf1] rounded-2xl shadow-2xl relative flex flex-col border border-amber-100/50"
         style={{ 
           backgroundImage: 'radial-gradient(#e5e7eb 0.5px, transparent 0.5px)', 
           backgroundSize: '10px 10px' 
@@ -365,7 +365,7 @@ export function ResultView({ data, onReset }: ResultViewProps) {
         </div>
 
         {/* Footer Section (Risks) */}
-        <div className={`mt-auto p-6 space-y-3 ${score === 'X' ? 'bg-red-50' : 'bg-red-50/80'} border-t border-red-100/50`}>
+        <div className={`p-6 space-y-3 ${score === 'X' ? 'bg-red-50' : 'bg-red-50/80'} border-t border-red-100/50`}>
           <div className="flex items-center gap-2">
             <img src="/assets/icon_risk_lock.png" alt="Risk" className="w-5 h-5 object-contain" />
             <h3 className={`text-xs font-bold uppercase tracking-widest ${score === 'X' ? 'text-red-600' : 'text-red-500/80'}`}>
@@ -387,6 +387,23 @@ export function ResultView({ data, onReset }: ResultViewProps) {
             ))}
           </div>
         </div>
+
+        {/* Poster QR Footer */}
+        <footer className="py-6 px-6 border-t border-amber-100/30 bg-amber-50/20 flex justify-end items-center">
+          <div className="flex items-center space-x-4">
+            <div className="text-right space-y-0.5">
+              <p className="text-[13px] font-bold text-zinc-700">获取更多盘古创新AI内参</p>
+              <p className="text-[10px] font-medium text-zinc-500">扫码关注【盘古创新方法论】</p>
+            </div>
+            <div className="relative">
+              <img 
+                src="/assets/qr_code.jpg" 
+                alt="盘古创新方法论" 
+                className="w-20 h-20 rounded-lg shadow-sm border border-white/80 object-cover"
+              />
+            </div>
+          </div>
+        </footer>
       </div>
 
       {/* Reset Button */}
