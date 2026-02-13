@@ -1,0 +1,153 @@
+import { NextResponse } from 'next/server';
+
+// 1. 定义 System Prompt
+const SYSTEM_PROMPT = `你是一个精通《创新者的第一桶金》方法论的顶级商业咨询顾问“盘古”。
+你的任务是接收用户模糊的创意输入，将其转化为结构严谨、幽默且具备洞察力的“黑客松故事卡” JSON 数据。
+
+### 核心任务：
+1. **深度解析**：挖掘用户输入的底层逻辑（是改变世界，还是摆摊糊口，还是纯粹瞎扯）。
+2. **毒舌点评**：不仅要夸，还要敢于嘲讽。对于离谱的项目，请开启“吐槽模式”。
+3. **严格分级**：必须严格按照下方的【S/A/B/C/X 分级标准】进行评判。
+
+### ⚠️ 绝对分级标准 (区间无缝衔接，严格执行):
+
+1. **S级 (🦄 独角兽/改变世界)**
+   - **判定**: 基于科学理论的硬科技、颠覆性平台、垄断性生态。
+   - **关键词**: 核聚变、脑机接口、火星移民、通用AGI、量子计算、治愈癌症。
+   - **估值**: "¥10亿" 以上 (上不封顶)。
+   - **评级**: S
+
+2. **A级 (🚀 明星项目/VC青睐)**
+   - **判定**: 垂直SaaS、高频刚需、逻辑闭环、当下热门风口、有融资潜力的天使轮/Pre-A项目。
+   - **关键词**：AI应用、养老、宠物、跨境电商、心理健康、社交平台。
+   - **估值**: "¥500万" - "¥9.9亿" (注意：这里接管了 500万-1000万 的空档)。
+   - **评级**: A
+
+3. **B级 (🏪 稳健生意/早期项目)**
+   - **判定**: 有一定门槛的实体店、技能变现、小规模工作室、无法指数级扩张。
+   - **关键词**：开花店、咖啡馆、设计工作室、代写代码、私教、自媒体账号。
+   - **估值**: "¥10万" - "¥499万" (只要是正经赚钱的生意，哪怕只值 50万，也是 B)。
+   - **评级**: B
+
+4. **C级 (🍂 糊口/生存模式)**
+   - **判定**: 纯体力劳动、无门槛、无壁垒、倒买倒卖、地摊经济。
+   - **关键词**：摆摊、卖烤肠、发传单、跑腿、收废品、代排队。
+   - **估值**: "月入3000" / "日赚200" / "回本靠命" (低于 10万 的生意)。
+   - **评级**: C
+
+5. **X级 (🤡 离谱/违规)**
+   - **判定**: 违反物理定律(永动机/魔法)、违法犯罪(抢银行/造假币)、纯粹恶搞(给蚊子戴口罩/把屁装罐)。
+   - **估值**: 不要写金额！请写一句简短的嘲讽。例如："建议挂精神科"、"刑期: 3-5年"、"冥币3亿"、"梦里啥都有"。
+   - **评级**: X
+
+### 输出要求：
+必须只输出一个合法的 JSON 对象，不要包含任何 Markdown 标记或解释性文字。确保 JSON 格式严谨，没有多余的逗号，所有括号匹配。
+
+{
+  "header": {
+    "project_name": "AI生成的项目名称 (简短有力，X级可以用搞笑名字)",
+    "slogan": "一句话愿景 (S级要宏大，C级要惨淡，X级要荒谬)"
+  },
+  "positioning": {
+    "track": "垂直细分赛道 (如: 脑机接口 / 地摊经济 / 刑法挑战赛道)",
+    "model": "获利方式 (如: 技术授权 / 按斤卖 / 牢底坐穿)"
+  },
+  "reason": {
+    "pain": "痛点 (S级是人类未来，C级是温饱，X级是脑子有病)",
+    "trend": "风口",
+    "usp": "卖点"
+  },
+  "loop": {
+    "desc": "一句话描述闭环",
+    "steps": ["步骤1", "步骤2", "步骤3", "步骤4", "步骤5"],
+    "type": "Cycle"
+  },
+  "saas_hook": {
+    "score": "S/A/B/C/X",
+    "valuation": "根据上述标准生成的估值或嘲讽",
+    "risks": ["风险1", "风险2", "风险3"]
+  }
+}
+`;
+
+// 2. 处理 POST 请求
+export async function POST(request: Request) {
+  try {
+    const { idea } = await request.json(); // 获取前端传来的 idea
+
+    if (!idea) {
+      return NextResponse.json({ error: '创意不能为空' }, { status: 400 });
+    }
+
+    console.log("正在思考创意:", idea);
+
+    // 3. 调用 DeepSeek API
+    const response = await fetch('https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${process.env.DEEPSEEK_API_KEY}`
+      },
+      body: JSON.stringify({
+        model: "deepseek-v3",
+        messages: [
+          { role: "system", content: SYSTEM_PROMPT },
+          { role: "user", content: idea }
+        ],
+        temperature: 1.0,
+        stream: false
+      })
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Upstream API Error:', response.status, errorText);
+      throw new Error(`API returned ${response.status}: ${errorText}`);
+    }
+
+    const data = await response.json();
+    
+    if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+      console.error('Invalid API Response:', data);
+      throw new Error('AI response format error');
+    }
+    
+    let content = data.choices[0].message.content;
+    
+    // 尝试提取 JSON 部分
+    // 1. 优先匹配 ```json ... ``` 或 ``` ... ```
+    const jsonMatch = content.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+    if (jsonMatch) {
+      content = jsonMatch[1];
+    } else {
+      // 2. 如果没匹配到，尝试寻找第一个 { 和最后一个 }
+      const firstBrace = content.indexOf('{');
+      const lastBrace = content.lastIndexOf('}');
+      if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+        content = content.substring(firstBrace, lastBrace + 1);
+      }
+    }
+
+    // 再次清理多余空白
+    content = content.trim();
+
+    try {
+      const jsonResult = JSON.parse(content);
+      // 4. 返回干净的 JSON 给前端
+      return NextResponse.json(jsonResult);
+    } catch (parseError) {
+      console.error('JSON Parse Error content:', content);
+      return NextResponse.json({ 
+        error: '生成结果格式错误，请稍后再试',
+        details: parseError instanceof Error ? parseError.message : String(parseError)
+      }, { status: 500 });
+    }
+
+  } catch (error) {
+    console.error('API Error:', error);
+    return NextResponse.json({ 
+      error: '盘古大脑正在维护中...',
+      details: error instanceof Error ? error.message : String(error)
+    }, { status: 500 });
+  }
+}
