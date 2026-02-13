@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useCallback } from "react"
-import { Lightbulb, Compass, ArrowRight, Wand2 } from "lucide-react"
+import { Lightbulb, Compass, ArrowRight, Wand2, X } from "lucide-react"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { Header } from "@/components/header"
 import { ValidateTab } from "@/components/validate-tab"
@@ -28,6 +28,7 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState("inspire")
   const [result, setResult] = useState<StoryCardData | null>(null)
   const [generatedIdeas, setGeneratedIdeas] = useState<string[]>([])
+  const [isModalOpen, setIsModalOpen] = useState(false)
   const { toast } = useToast()
 
   const handleGenerate = useCallback(async () => {
@@ -257,6 +258,53 @@ export default function Home() {
         onComplete={handleLoadingComplete}
         customMessages={loadingType === "expand" ? ["正在分析灵感...", "正在生成想法...", "正在构建商业雏形..."] : undefined}
       />
+
+      {/* Footer Section */}
+      <footer className="mt-auto py-8 px-5 border-t border-border/40 bg-muted/5">
+        <div className="flex flex-col items-center gap-2">
+          <p className="text-[10px] text-muted-foreground/50 tracking-wider">
+            黑客松故事卡来源于《创新者的第一桶金》
+          </p>
+          <button 
+            onClick={() => setIsModalOpen(true)}
+            className="text-[11px] font-medium text-muted-foreground/80 hover:text-red-500 transition-colors flex items-center gap-1 underline underline-offset-4 decoration-muted-foreground/20"
+          >
+            👨‍💻 作者公众号 / 反馈建议
+          </button>
+        </div>
+      </footer>
+
+      {/* QR Code Modal */}
+      {isModalOpen && (
+        <div 
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm animate-in fade-in duration-200"
+          onClick={() => setIsModalOpen(false)}
+        >
+          <div 
+            className="relative mx-5 w-full max-w-[280px] overflow-hidden rounded-3xl bg-white p-6 shadow-2xl animate-in zoom-in-95 duration-200"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button 
+              onClick={() => setIsModalOpen(false)}
+              className="absolute right-3 top-3 rounded-full bg-secondary/50 p-1 text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors"
+            >
+              <X className="h-4 w-4" />
+            </button>
+            <div className="flex flex-col items-center gap-4">
+              <div className="relative aspect-square w-full overflow-hidden rounded-xl bg-muted">
+                <img 
+                  src="/assets/qrcode.jpg" 
+                  alt="QR Code" 
+                  className="h-full w-full object-cover"
+                />
+              </div>
+              <p className="text-center text-xs font-medium text-muted-foreground">
+                长按或扫码关注公众号
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

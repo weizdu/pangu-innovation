@@ -257,13 +257,13 @@ export function ResultView({ data, onReset }: ResultViewProps) {
 
             {/* Valuation Section */}
              <div className="relative flex items-center justify-center w-full mt-2 pb-4 px-6">
-               {/* Centered Text Container - Conditional width based on badge presence */}
+               {/* Centered Text Container - Restricted width to ensure badge space and prevent overflow */}
                <div className={`relative flex flex-col items-center justify-center text-center ${
-                 (score === 'S' || score === 'A' || score === 'X') ? 'max-w-[160px]' : 'max-w-[280px]'
+                 (score === 'S' || score === 'A' || score === 'X') ? 'max-w-[180px]' : 'max-w-[300px]'
                }`}>
                  {/* Large Badge - Absolutely positioned to the LEFT of the text container */}
                  {(score === 'S' || score === 'A' || score === 'X') && (
-                   <div className="absolute right-[calc(100%+1rem)] top-1/2 -translate-y-1/2">
+                   <div className="absolute right-[calc(100%+0.75rem)] top-1/2 -translate-y-1/2">
                      <img 
                        src={score === 'X' ? "/assets/badge_clown.png" : "/assets/badge_valuation.png"} 
                        alt="Badge"
@@ -275,7 +275,7 @@ export function ResultView({ data, onReset }: ResultViewProps) {
                  <p className="text-sm font-black text-amber-900/50 tracking-[0.2em] uppercase mb-0.5">
                    第一桶金估值
                  </p>
-                 <div className={`${getValuationFontSize(data.saas_hook.valuation)} font-black ${theme.textPrimary} tracking-tighter leading-tight drop-shadow-sm break-words`}>
+                 <div className={`${getValuationFontSize(data.saas_hook.valuation)} font-black ${theme.textPrimary} tracking-tighter leading-tight drop-shadow-sm break-words overflow-hidden`}>
                    {data.saas_hook.valuation}
                  </div>
                </div>
@@ -336,9 +336,9 @@ export function ResultView({ data, onReset }: ResultViewProps) {
             
             <div className="relative space-y-6 before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-0.5 before:bg-amber-900/10">
               {data.loop.steps.map((step, index) => (
-                <div key={index} className="relative pl-8 animate-in fade-in slide-in-from-left-2 duration-300" style={{ animationDelay: `${index * 100}ms` }}>
+                <div key={index} className="relative flex items-start pl-8 animate-in fade-in slide-in-from-left-2 duration-300" style={{ animationDelay: `${index * 100}ms` }}>
                   {/* Timeline Circle with SVG for guaranteed centering in screenshots */}
-                  <div className="absolute left-0 top-1 z-10">
+                  <div className="absolute left-0 top-0 mt-1 z-10">
                     <svg width="22" height="22" viewBox="0 0 22 22">
                       <circle cx="11" cy="11" r="10" fill={theme.bgLight.includes('blue') ? '#DBEAFE' : '#FEF3C7'} />
                       <text 
@@ -355,7 +355,7 @@ export function ResultView({ data, onReset }: ResultViewProps) {
                       </text>
                     </svg>
                   </div>
-                  <div className="bg-white/40 rounded-lg p-2.5 border border-white/60">
+                  <div className="flex-1 bg-white/40 rounded-lg p-2.5 border border-white/60">
                     <p className="text-xs text-amber-950/70 font-medium leading-relaxed">{step}</p>
                   </div>
                 </div>
@@ -365,7 +365,7 @@ export function ResultView({ data, onReset }: ResultViewProps) {
         </div>
 
         {/* Footer Section (Risks) */}
-        <div className={`mt-auto p-6 space-y-3 ${score === 'X' ? 'bg-red-50' : 'bg-red-50/80'} border-t border-red-100/50`}>
+        <div className={`p-6 space-y-3 ${score === 'X' ? 'bg-red-50' : 'bg-red-50/80'} border-t border-red-100/50`}>
           <div className="flex items-center gap-2">
             <img src="/assets/icon_risk_lock.png" alt="Risk" className="w-5 h-5 object-contain" />
             <h3 className={`text-xs font-bold uppercase tracking-widest ${score === 'X' ? 'text-red-600' : 'text-red-500/80'}`}>
@@ -376,17 +376,34 @@ export function ResultView({ data, onReset }: ResultViewProps) {
             {data.saas_hook.risks.map((risk, index) => (
               <span 
                 key={index} 
-                className={`text-[11px] px-2 py-0.5 rounded-md font-medium border ${
+                className={`flex items-center justify-center text-[11px] px-2 py-1.5 rounded-md font-medium border leading-none ${
                   score === 'X' 
                     ? 'bg-red-100/50 border-red-200 text-red-600' 
                     : 'bg-white/60 border-red-100 text-red-500/70'
                 }`}
               >
-                {risk}
+                <span className="pb-[2px]">{risk}</span>
               </span>
             ))}
           </div>
         </div>
+
+        {/* Poster QR Footer */}
+        <footer className="mt-auto py-6 px-6 border-t border-amber-100/30 bg-amber-50/20 flex justify-end items-center">
+          <div className="flex items-center space-x-4">
+            <div className="text-right space-y-0.5">
+              <p className="text-sm font-bold text-zinc-700">获取更多盘古创新AI内参</p>
+              <p className="text-[11px] font-medium text-zinc-500">扫码关注【盘古创新方法论】</p>
+            </div>
+            <div className="relative">
+              <img 
+                src="/assets/qr_code.jpg" 
+                alt="盘古创新方法论" 
+                className="w-24 h-24 rounded-xl shadow-md border-2 border-white/80"
+              />
+            </div>
+          </div>
+        </footer>
       </div>
 
       {/* Reset Button */}
