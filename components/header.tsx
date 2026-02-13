@@ -4,7 +4,7 @@ export function Header() {
       <div className="flex items-center gap-2">
         <div className="flex h-8 w-8 items-center justify-center">
           <img 
-            src="/assets/pangu logo.png" 
+            src="/assets/pangu_logo.png" 
             alt="Logo" 
             className="h-full w-full object-contain"
           />
